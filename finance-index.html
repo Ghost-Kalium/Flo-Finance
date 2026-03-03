@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flo — Personal Finance Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="finance-style.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo">
+        <span class="logo-mark">◎</span>
+        <span class="logo-name">Flo</span>
+        <span class="logo-tag">Finance</span>
+      </div>
+      <div class="header-actions">
+        <button class="btn-ghost" id="exportBtn">↓ Export CSV</button>
+        <button class="btn-danger" id="clearBtn">Clear Data</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <section class="summary-row">
+      <div class="summary-card income-card">
+        <div class="summary-icon">↑</div>
+        <div class="summary-label">Total Income</div>
+        <div class="summary-value" id="totalIncome">$0.00</div>
+        <div class="summary-sub" id="incomeCount">0 transactions</div>
+      </div>
+      <div class="summary-card expense-card">
+        <div class="summary-icon">↓</div>
+        <div class="summary-label">Total Expenses</div>
+        <div class="summary-value" id="totalExpense">$0.00</div>
+        <div class="summary-sub" id="expenseCount">0 transactions</div>
+      </div>
+      <div class="summary-card balance-card">
+        <div class="summary-icon">◈</div>
+        <div class="summary-label">Net Balance</div>
+        <div class="summary-value" id="netBalance">$0.00</div>
+        <div class="summary-sub" id="balanceStatus">Add transactions to begin</div>
+      </div>
+      <div class="summary-card savings-card">
+        <div class="summary-icon">◇</div>
+        <div class="summary-label">Savings Rate</div>
+        <div class="summary-value" id="savingsRate">—</div>
+        <div class="summary-sub">of income saved</div>
+      </div>
+    </section>
+
+    <div class="grid">
+
+      <!-- LEFT COLUMN -->
+      <div class="left-col">
+
+        <!-- ADD TRANSACTION -->
+        <div class="card" id="addCard">
+          <div class="card-header">
+            <h2 class="card-title">Add Transaction</h2>
+            <div class="type-toggle">
+              <button class="type-btn active" id="typeIncome" data-type="income">Income</button>
+              <button class="type-btn" id="typeExpense" data-type="expense">Expense</button>
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="form-group full">
+              <label>Description</label>
+              <input type="text" id="txDesc" placeholder="e.g. Freelance payment, Groceries…" />
+            </div>
+            <div class="form-group">
+              <label>Amount ($)</label>
+              <input type="number" id="txAmount" placeholder="0.00" min="0" step="0.01" />
+            </div>
+            <div class="form-group">
+              <label>Category</label>
+              <select id="txCategory"><option value="">Select category</option></select>
+            </div>
+            <div class="form-group">
+              <label>Date</label>
+              <input type="date" id="txDate" />
+            </div>
+            <div class="form-group">
+              <label>Month</label>
+              <select id="txMonth">
+                <option value="Jan">January</option><option value="Feb">February</option>
+                <option value="Mar">March</option><option value="Apr">April</option>
+                <option value="May">May</option><option value="Jun">June</option>
+                <option value="Jul">July</option><option value="Aug">August</option>
+                <option value="Sep">September</option><option value="Oct">October</option>
+                <option value="Nov">November</option><option value="Dec">December</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn-primary" id="addTxBtn">+ Add Transaction</button>
+        </div>
+
+        <!-- BUDGET GOALS -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Budget Goals</h2>
+            <button class="btn-small" id="addGoalBtn">+ Add Goal</button>
+          </div>
+          <div id="goalsContainer">
+            <div class="empty-state-small">No goals yet. Set a spending limit per category.</div>
+          </div>
+          <div class="goal-form hidden" id="goalForm">
+            <select id="goalCategory" class="goal-input"><option value="">Category</option></select>
+            <input type="number" id="goalAmount" class="goal-input" placeholder="Limit $" min="0" />
+            <button class="btn-primary-sm" id="saveGoalBtn">Save</button>
+            <button class="btn-cancel" id="cancelGoalBtn">✕</button>
+          </div>
+        </div>
+
+        <!-- TRANSACTION LIST -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Transactions</h2>
+            <select class="filter-select" id="filterCat">
+              <option value="all">All Categories</option>
+            </select>
+          </div>
+          <div id="txList">
+            <div class="empty-state">
+              <div class="empty-icon">◎</div>
+              <p>No transactions yet.</p>
+              <p class="empty-sub">Add your first income or expense above.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- RIGHT COLUMN -->
+      <div class="right-col">
+
+        <!-- AI INSIGHTS -->
+        <div class="card ai-card">
+          <div class="card-header">
+            <div class="ai-label-wrap">
+              <span class="ai-badge">✦ AI</span>
+              <h2 class="card-title">Spending Insights</h2>
+            </div>
+            <button class="btn-ai" id="analyzeBtn">Analyze</button>
+          </div>
+          <div id="aiOutput" class="ai-output">
+            <div class="ai-placeholder">
+              <span class="ai-placeholder-icon">✦</span>
+              <p>Add some transactions, then click <strong>Analyze</strong> for AI-powered insights on your spending habits.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- CATEGORY CHART -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Category Breakdown</h2>
+            <span class="chart-sub-label">Expenses only</span>
+          </div>
+          <div class="chart-wrap doughnut-wrap">
+            <canvas id="categoryChart"></canvas>
+          </div>
+          <div id="categoryLegend" class="custom-legend"></div>
+        </div>
+
+        <!-- MONTHLY CHART -->
+        <div class="card">
+          <div class="card-header">
+            <h2 class="card-title">Monthly Summary</h2>
+            <span class="chart-sub-label">Income vs Expenses</span>
+          </div>
+          <div class="chart-wrap">
+            <canvas id="monthlyChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+
+  <!-- CLEAR CONFIRM MODAL -->
+  <div class="modal-overlay hidden" id="modalOverlay">
+    <div class="modal">
+      <h3 class="modal-title">Clear all data?</h3>
+      <p class="modal-desc">This will permanently delete all transactions and goals. This cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="modalCancel">Cancel</button>
+        <button class="btn-danger" id="modalConfirm">Yes, clear everything</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="finance-script.js"></script>
+</body>
+</html>
